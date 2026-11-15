@@ -79,6 +79,8 @@ final class SettingsController: NSObject, NSWindowDelegate {
         heading.font = .systemFont(ofSize: 13, weight: .semibold)
         let note = NSTextField(wrappingLabelWithString: "Pick a color for the action wheel. The lighter sectors and the label in the middle follow it.")
         note.font = .systemFont(ofSize: 11); note.textColor = .secondaryLabelColor
+        note.preferredMaxLayoutWidth = 290
+        note.widthAnchor.constraint(equalToConstant: 290).isActive = true
 
         let swatches = NSStackView(); swatches.orientation = .horizontal; swatches.spacing = 8
         for (index, preset) in WheelTheme.presets.enumerated() {
@@ -117,6 +119,9 @@ final class SettingsController: NSObject, NSWindowDelegate {
             customRow.widthAnchor.constraint(equalTo: left.widthAnchor),
         ])
         window.contentView = content
+        content.layoutSubtreeIfNeeded()
+        window.setContentSize(content.fittingSize)
+        window.center()
         self.window = window
     }
 
@@ -133,10 +138,10 @@ private final class WheelSwatch: NSView {
         let center = CGPoint(x: bounds.midX, y: bounds.midY)
         let radius = min(bounds.width, bounds.height) / 2 - 10
         for index in 0..<6 {
-            let start = CGFloat(index) * 60 + 5
+            let start = CGFloat(index) * 60 + 64
             let path = NSBezierPath()
-            path.appendArc(withCenter: center, radius: radius, startAngle: start, endAngle: start + 50)
-            path.lineWidth = 15; path.lineCapStyle = .round
+            path.appendArc(withCenter: center, radius: radius, startAngle: start, endAngle: start + 52)
+            path.lineWidth = 15; path.lineCapStyle = .butt
             (index == 1 ? WheelTheme.highlighted : WheelTheme.resting).setStroke()
             path.stroke()
         }
