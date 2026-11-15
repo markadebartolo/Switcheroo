@@ -9,7 +9,7 @@ struct OutputSession {
 enum OutputStore {
     static var defaultFolder: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("OrbitDrop", isDirectory: true)
+            .appendingPathComponent("Switcheroo", isDirectory: true)
     }
 
     static func makeSession(sources: [URL], base: URL?) throws -> OutputSession {

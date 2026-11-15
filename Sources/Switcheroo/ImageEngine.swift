@@ -15,7 +15,7 @@ enum ImageEngine {
                                       bitsPerComponent: 8, bytesPerRow: width * 4,
                                       space: CGColorSpace(name: CGColorSpace.sRGB)!,
                                       bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
-            throw OrbitError.message("This image is too large. Use dimensions below 16,000 pixels and 64 megapixels.")
+            throw SwitcherooError.message("This image is too large. Use dimensions below 16,000 pixels and 64 megapixels.")
         }
         context.interpolationQuality = .high
         return context
@@ -30,16 +30,16 @@ enum ImageEngine {
         if url.pathExtension.lowercased() == "pdf" {
             guard let document = PDFDocument(url: url), !document.isLocked,
                   let pdfPage = document.page(at: page) else {
-                throw OrbitError.message("Could not open this PDF. Encrypted PDFs must be unlocked first.")
+                throw SwitcherooError.message("Could not open this PDF. Encrypted PDFs must be unlocked first.")
             }
             let bounds = pdfPage.bounds(for: .mediaBox)
-            guard bounds.width > 0, bounds.height > 0 else { throw OrbitError.message("This PDF page has no size.") }
+            guard bounds.width > 0, bounds.height > 0 else { throw SwitcherooError.message("This PDF page has no size.") }
             let scale = min(2, 8000 / max(bounds.width, bounds.height))
             let size = NSSize(width: max(1, bounds.width * scale), height: max(1, bounds.height * scale))
             let thumb = pdfPage.thumbnail(of: size, for: .mediaBox)
             var rect = CGRect(origin: .zero, size: thumb.size)
             guard let result = thumb.cgImage(forProposedRect: &rect, context: nil, hints: nil) else {
-                throw OrbitError.message("Could not render this PDF page.")
+                throw SwitcherooError.message("Could not render this PDF page.")
             }
             return result
         }
@@ -49,7 +49,7 @@ enum ImageEngine {
               let height = props[kCGImagePropertyPixelHeight] as? Int,
               width > 0, height > 0, width <= 16000, height <= 16000,
               width * height <= maximumPixels else {
-            throw OrbitError.message("Use a PDF or an image under 64 megapixels. This file could not be decoded.")
+            throw SwitcherooError.message("Use a PDF or an image under 64 megapixels. This file could not be decoded.")
         }
         // Bake EXIF orientation into pixels before editing or stripping metadata.
         let options: [CFString: Any] = [
@@ -59,7 +59,7 @@ enum ImageEngine {
             kCGImageSourceShouldCacheImmediately: true
         ]
         guard let result = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
-            throw OrbitError.message("macOS cannot decode this image.")
+            throw SwitcherooError.message("macOS cannot decode this image.")
         }
         return result
     }
@@ -80,7 +80,7 @@ enum ImageEngine {
             var bounds = CGRect(x: 0, y: 0, width: CGFloat(image.width), height: CGFloat(image.height))
             guard let consumer = CGDataConsumer(data: data as CFMutableData),
                   let ctx = CGContext(consumer: consumer, mediaBox: &bounds, nil) else {
-                throw OrbitError.message("Could not create a PDF.")
+                throw SwitcherooError.message("Could not create a PDF.")
             }
             ctx.beginPDFPage(nil)
             ctx.draw(image, in: bounds)
@@ -90,7 +90,7 @@ enum ImageEngine {
         }
         guard let type = UTType(filenameExtension: format),
               (CGImageDestinationCopyTypeIdentifiers() as! [String]).contains(type.identifier) else {
-            throw OrbitError.message("This macOS version cannot encode \(format.uppercased()).")
+            throw SwitcherooError.message("This macOS version cannot encode \(format.uppercased()).")
         }
         var output = image
         if ["jpg", "jpeg", "bmp"].contains(format) {
@@ -103,17 +103,17 @@ enum ImageEngine {
         }
         let data = NSMutableData()
         guard let destination = CGImageDestinationCreateWithData(data as CFMutableData, type.identifier as CFString, 1, nil) else {
-            throw OrbitError.message("Could not create the destination image.")
+            throw SwitcherooError.message("Could not create the destination image.")
         }
         CGImageDestinationAddImage(destination, output, [kCGImageDestinationLossyCompressionQuality: quality] as CFDictionary)
-        guard CGImageDestinationFinalize(destination) else { throw OrbitError.message("Image encoding failed.") }
+        guard CGImageDestinationFinalize(destination) else { throw SwitcherooError.message("Image encoding failed.") }
         return data as Data
     }
 
     static func save(_ data: Data, source: URL, suffix: String, ext: String, folder: URL?) throws -> URL {
         let directory = folder ?? source.deletingLastPathComponent()
         let stem = source.deletingPathExtension().lastPathComponent + suffix
-        let temporary = directory.appendingPathComponent(".orbitdrop-\(UUID().uuidString)")
+        let temporary = directory.appendingPathComponent(".switcheroo-\(UUID().uuidString)")
         try data.write(to: temporary, options: .atomic)
         defer { try? FileManager.default.removeItem(at: temporary) }
         // Moving a temporary file never overwrites an existing destination.
@@ -129,7 +129,7 @@ enum ImageEngine {
                 throw error
             }
         }
-        throw OrbitError.message("Too many files with the same name in this folder.")
+        throw SwitcherooError.message("Too many files with the same name in this folder.")
     }
 
     static func convert(_ url: URL, format: String, folder: URL?) throws -> [URL] {
@@ -139,7 +139,7 @@ enum ImageEngine {
             return [try save(data, source: url, suffix: "", ext: format, folder: folder)]
         }
         let count = pageCount(url)
-        guard count > 0 else { throw OrbitError.message("This PDF has no readable pages.") }
+        guard count > 0 else { throw SwitcherooError.message("This PDF has no readable pages.") }
         var outputs: [URL] = []
         // A failed multi-page conversion rolls back only the files it created.
         do {
@@ -167,7 +167,7 @@ enum ImageEngine {
         var pages: [String] = []
         if url.pathExtension.lowercased() == "pdf" {
             guard let document = PDFDocument(url: url), !document.isLocked else {
-                throw OrbitError.message("Could not read this PDF.")
+                throw SwitcherooError.message("Could not read this PDF.")
             }
             for index in 0..<document.pageCount {
                 let embedded = document.page(at: index)?.string ?? ""
@@ -177,7 +177,7 @@ enum ImageEngine {
         } else { pages = [try recognize(load(url))] }
         let result = pages.joined(separator: "\n\n")
         guard !result.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            throw OrbitError.message("No readable text was found in this file.")
+            throw SwitcherooError.message("No readable text was found in this file.")
         }
         return result
     }
@@ -187,7 +187,7 @@ enum ImageEngine {
                                width: rect.width.rounded(), height: rect.height.rounded())
         let clamped = requested.intersection(CGRect(x: 0, y: 0, width: CGFloat(image.width), height: CGFloat(image.height)))
         guard !clamped.isNull, clamped.width >= 1, clamped.height >= 1 else {
-            throw OrbitError.message("Select an area to crop.")
+            throw SwitcherooError.message("Select an area to crop.")
         }
         let ctx = try context(width: Int(clamped.width), height: Int(clamped.height))
         ctx.draw(image, in: CGRect(x: -clamped.minX, y: -clamped.minY, width: CGFloat(image.width), height: CGFloat(image.height)))
@@ -234,11 +234,11 @@ enum ImageEngine {
         filter.setValue(brightness, forKey: kCIInputBrightnessKey)
         filter.setValue(contrast, forKey: kCIInputContrastKey)
         filter.setValue(saturation, forKey: kCIInputSaturationKey)
-        guard var output = filter.outputImage else { throw OrbitError.message("Could not adjust this image.") }
+        guard var output = filter.outputImage else { throw SwitcherooError.message("Could not adjust this image.") }
         let orientation: Int32 = [1, 6, 3, 8][((turns % 4) + 4) % 4]
         output = output.oriented(forExifOrientation: orientation)
         guard let cg = CIContext().createCGImage(output, from: output.extent) else {
-            throw OrbitError.message("Could not render these adjustments.")
+            throw SwitcherooError.message("Could not render these adjustments.")
         }
         return cg
     }

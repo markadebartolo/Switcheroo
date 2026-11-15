@@ -2,7 +2,7 @@ import AppKit
 import UniformTypeIdentifiers
 import ImageIO
 
-enum OrbitError: LocalizedError {
+enum SwitcherooError: LocalizedError {
     case message(String)
     var errorDescription: String? {
         switch self { case .message(let value): return value }

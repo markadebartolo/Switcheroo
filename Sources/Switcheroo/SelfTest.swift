@@ -6,9 +6,9 @@ enum SelfTest {
     static func run() throws {
         var checks = 0
         func check(_ condition: @autoclosure () -> Bool, _ message: String) throws {
-            guard condition() else { throw OrbitError.message(message) }; checks += 1
+            guard condition() else { throw SwitcherooError.message(message) }; checks += 1
         }
-        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("OrbitDrop-tests-\(UUID().uuidString)")
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("Switcheroo-tests-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: folder) }
         let ctx = try ImageEngine.context(width: 240, height: 160)
@@ -106,7 +106,7 @@ enum SelfTest {
         let white = jpegSample.data!.assumingMemoryBound(to: UInt8.self)
         try check(white[0] > 240 && white[1] > 240 && white[2] > 240,
                   "Transparent JPEG background is not white")
-        let archiveBase = folder.appendingPathComponent("OrbitDrop history", isDirectory: true)
+        let archiveBase = folder.appendingPathComponent("Switcheroo history", isDirectory: true)
         let session = try OutputStore.makeSession(sources: [source], base: archiveBase)
         let beforeURL = session.before.appendingPathComponent(source.lastPathComponent)
         let beforeData = try Data(contentsOf: beforeURL)
@@ -117,6 +117,6 @@ enum SelfTest {
         try check(session.root.lastPathComponent.count >= 20, "History folder is not timestamped")
         let finalSource = try Data(contentsOf: source)
         try check(finalSource == originalData, "Source changed after all checks")
-        print("OrbitDrop: \(checks) checks passed.")
+        print("Switcheroo: \(checks) checks passed.")
     }
 }

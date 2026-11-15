@@ -28,8 +28,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NSApp.setActivationPolicy(.accessory)
         createMainMenu()
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        statusItem.button?.image = NSImage(systemSymbolName: "circle.hexagongrid.fill", accessibilityDescription: "OrbitDrop")
-        statusItem.button?.toolTip = "OrbitDrop — file actions at your cursor"
+        statusItem.button?.image = NSImage(systemSymbolName: "circle.hexagongrid.fill", accessibilityDescription: "Switcheroo")
+        statusItem.button?.toolTip = "Switcheroo — file actions at your cursor"
         let menu = NSMenu(); menu.delegate = self; menu.autoenablesItems = false; statusItem.menu = menu
         wheel.view.chooseFiles = { [weak self] in self?.chooseFiles() }
         wheel.view.perform = { [weak self] action, files in self?.perform(action, files: files) }
@@ -53,8 +53,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
     private func createMainMenu() {
         let main = NSMenu()
-        let app = NSMenuItem(); main.addItem(app); app.submenu = NSMenu(title: "OrbitDrop")
-        let quit = NSMenuItem(title: "Quit OrbitDrop", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let app = NSMenuItem(); main.addItem(app); app.submenu = NSMenu(title: "Switcheroo")
+        let quit = NSMenuItem(title: "Quit Switcheroo", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         app.submenu?.addItem(quit)
         let edit = NSMenuItem(title: "Edit", action: nil, keyEquivalent: ""); main.addItem(edit)
         edit.submenu = NSMenu(title: "Edit")
@@ -75,14 +75,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let auto = add("Show wheel while dragging files", #selector(toggleAutomatic)); auto.state = automatic ? .on : .off
         let outputMenu = NSMenu(title: "History folder")
         let item = NSMenuItem(title: "History folder", action: nil, keyEquivalent: ""); item.submenu = outputMenu; menu.addItem(item)
-        let alongside = NSMenuItem(title: "Documents/OrbitDrop", action: #selector(useDefaultFolder), keyEquivalent: "")
+        let alongside = NSMenuItem(title: "Documents/Switcheroo", action: #selector(useDefaultFolder), keyEquivalent: "")
         alongside.target = self; alongside.state = folder == nil ? .on : .off; outputMenu.addItem(alongside)
         let custom = NSMenuItem(title: folder.map { "Choose folder… (\($0.lastPathComponent))" } ?? "Choose folder…", action: #selector(chooseFolder), keyEquivalent: "")
         custom.target = self; custom.state = folder == nil ? .off : .on; outputMenu.addItem(custom)
         let recent = add("Reveal last saved files", #selector(revealLast)); recent.isEnabled = !lastOutputs.isEmpty
         menu.addItem(.separator())
-        _ = add("How to use OrbitDrop", #selector(showWelcome))
-        _ = add("Quit OrbitDrop", #selector(quit), key: "q")
+        _ = add("How to use Switcheroo", #selector(showWelcome))
+        _ = add("Quit Switcheroo", #selector(quit), key: "q")
     }
     @objc private func quit() { NSApp.terminate(nil) }
     @objc private func toggleAutomatic() { automatic.toggle(); if !automatic { wheel.hide() } }
@@ -152,7 +152,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func beginProgress(_ text: String) {
         working = true
         let panel = NSPanel(contentRect: CGRect(x: 0, y: 0, width: 400, height: 115), styleMask: [.titled], backing: .buffered, defer: false)
-        panel.title = "OrbitDrop"; panel.isReleasedWhenClosed = false
+        panel.title = "Switcheroo"; panel.isReleasedWhenClosed = false
         let label = NSTextField(labelWithString: text); label.frame = CGRect(x: 24, y: 62, width: 352, height: 26)
         label.font = .systemFont(ofSize: 13, weight: .medium); panel.contentView?.addSubview(label)
         let progress = NSProgressIndicator(frame: CGRect(x: 24, y: 30, width: 352, height: 15))
@@ -223,12 +223,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if let welcome, welcome.isVisible { welcome.makeKeyAndOrderFront(nil); return }
         let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 520, height: 365),
                               styleMask: [.titled, .closable], backing: .buffered, defer: false)
-        window.title = "Welcome to OrbitDrop"; window.isReleasedWhenClosed = false
-        let title = NSTextField(labelWithString: "Your files. One simple orbit.")
+        window.title = "Welcome to Switcheroo"; window.isReleasedWhenClosed = false
+        let title = NSTextField(labelWithString: "Your files. One quick switch.")
         title.font = .systemFont(ofSize: 24, weight: .bold); title.frame = CGRect(x: 30, y: 294, width: 465, height: 36)
         window.contentView?.addSubview(title)
         let detail = NSTextField(wrappingLabelWithString:
-            "1. Choose a file below, or click the menu-bar icon and choose Show action wheel.\n\n2. Click a format to convert. Tab switches to Crop, Add BG, and editing tools. Optional Finder drag detection can be enabled in the menu.\n\n3. Each action saves Before and After copies in a timestamped Documents/OrbitDrop folder. Change the history location from the menu-bar icon.\n\nYou can also choose files below, then click an action. Tab switches wheels; Escape closes. All processing stays on your Mac.")
+            "1. Choose a file below, or click the menu-bar icon and choose Show action wheel.\n\n2. Click a format to convert. Tab switches to Crop, Add BG, and editing tools. Optional Finder drag detection can be enabled in the menu.\n\n3. Each action saves Before and After copies in a timestamped Documents/Switcheroo folder. Change the history location from the menu-bar icon.\n\nYou can also choose files below, then click an action. Tab switches wheels; Escape closes. All processing stays on your Mac.")
         detail.font = .systemFont(ofSize: 13); detail.frame = CGRect(x: 30, y: 77, width: 460, height: 202)
         window.contentView?.addSubview(detail)
         let open = NSButton(title: "Choose a file…", target: self, action: #selector(welcomeChoose))

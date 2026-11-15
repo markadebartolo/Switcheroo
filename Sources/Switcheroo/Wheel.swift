@@ -1,17 +1,17 @@
 import AppKit
 
-final class OrbitPanel: NSPanel {
+final class SwitcherooPanel: NSPanel {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
 }
 
 final class WheelController {
-    let panel: OrbitPanel
+    let panel: SwitcherooPanel
     let view: WheelView
     var automatic = false
 
     init() {
-        panel = OrbitPanel(contentRect: NSRect(x: 0, y: 0, width: 320, height: 354),
+        panel = SwitcherooPanel(contentRect: NSRect(x: 0, y: 0, width: 320, height: 354),
                            styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
         panel.isOpaque = false
         panel.backgroundColor = .clear
@@ -75,7 +75,7 @@ final class WheelView: NSView {
         closeButton.isBordered = false
         closeButton.target = self; closeButton.action = #selector(closeWheel)
         addSubview(closeButton)
-        setAccessibilityLabel("OrbitDrop action wheel")
+        setAccessibilityLabel("Switcheroo action wheel")
         rebuild()
     }
 

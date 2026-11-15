@@ -30,7 +30,7 @@ final class EditorController: NSWindowController, NSWindowDelegate {
         canvas = ImageCanvas(image: image, action: action, frame: NSRect(x: 22, y: 255, width: 516, height: 430))
         body = NSView(frame: NSRect(x: 0, y: 0, width: 560, height: 744))
         let window = NSWindow(contentRect: body.bounds, styleMask: [.titled, .closable, .miniaturizable], backing: .buffered, defer: false)
-        window.title = "\(action.title.capitalized) — OrbitDrop"
+        window.title = "\(action.title.capitalized) — Switcheroo"
         window.isReleasedWhenClosed = false
         window.contentView = body
         super.init(window: window)
@@ -274,7 +274,7 @@ final class EditorController: NSWindowController, NSWindowDelegate {
                 case .annotate, .redact:
                     result = try ImageEngine.marked(image, marks: marks, redacting: action == .redact)
                     suffix = action == .redact ? " Redacted" : " Annotated"; ext = "png"
-                default: throw OrbitError.message("Unsupported editor action.")
+                default: throw SwitcherooError.message("Unsupported editor action.")
                 }
                 let data = try ImageEngine.encoded(result, format: ext, quality: quality)
                 let session = try OutputStore.makeSession(sources: [source], base: folder)

@@ -2,8 +2,8 @@
 import PackageDescription
 
 let package = Package(
-    name: "OrbitDrop",
+    name: "Switcheroo",
     platforms: [.macOS(.v13)],
-    products: [.executable(name: "OrbitDrop", targets: ["OrbitDrop"])],
-    targets: [.executableTarget(name: "OrbitDrop")]
+    products: [.executable(name: "Switcheroo", targets: ["Switcheroo"])],
+    targets: [.executableTarget(name: "Switcheroo")]
 )

@@ -1,24 +1,24 @@
 <p align="center">
-  <img src="docs/media/orbitdrop-icon.png" alt="OrbitDrop" width="96" height="96">
+  <img src="docs/media/switcheroo-icon.png" alt="Switcheroo" width="96" height="96">
 </p>
 
 <p align="center">
-  <strong>OrbitDrop</strong><br>
-  <sub>A floating action wheel for your files: drag an image or PDF, drop it on what you want done</sub>
+  <strong>Switcheroo</strong><br>
+  <sub>Switch a file into what you need: drop an image or PDF on a floating wheel to convert, crop, compress or redact it</sub>
 </p>
 
 <p align="center">
-  <a href="https://github.com/markadebartolo/OrbitDrop/releases/latest"><strong>Download for Mac</strong></a>
+  <a href="https://github.com/markadebartolo/Switcheroo/releases/latest"><strong>Download for Mac</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/markadebartolo/OrbitDrop/releases">All releases</a>
+  <a href="https://github.com/markadebartolo/Switcheroo/releases">All releases</a>
 </p>
 
 ---
 
-## Why OrbitDrop
+## Why Switcheroo
 
 Converting a screenshot, cropping a photo or pulling the text out of a PDF usually means opening an app,
-finding the file, exporting, and naming the result. OrbitDrop puts those actions in a small wheel that
+finding the file, exporting, and naming the result. Switcheroo puts those actions in a small wheel that
 appears where you are already working. Drop a file on a sector and the result is saved beside a copy of
 the original. Everything runs on your Mac: no account, no network calls, no third-party code.
 
@@ -39,18 +39,18 @@ the original. Everything runs on your Mac: no account, no network calls, no thir
 
 ## Get started
 
-1. Download **OrbitDrop-macos.zip** from [Releases](https://github.com/markadebartolo/OrbitDrop/releases/latest) and unzip it.
-2. Move **OrbitDrop.app** to your Applications folder and open it.
-3. Click the orbit icon in the menu bar, then **Choose files…** or **Show action wheel**.
+1. Download **Switcheroo-macos.zip** from [Releases](https://github.com/markadebartolo/Switcheroo/releases/latest) and unzip it.
+2. Move **Switcheroo.app** to your Applications folder and open it.
+3. Click the Switcheroo icon in the menu bar, then **Choose files…** or **Show action wheel**.
 4. Drop a file on a sector, or press its number key.
-5. Find the result in `~/Documents/OrbitDrop`, in the newest folder, under `After`.
+5. Find the result in `~/Documents/Switcheroo`, in the newest folder, under `After`.
 
 ### Who can use the download
 
 | | |
 |--|--|
 | **Works on** | Apple Silicon and Intel Macs · macOS 13 Ventura or later |
-| **File** | `OrbitDrop-macos.zip`, a universal build |
+| **File** | `Switcheroo-macos.zip`, a universal build |
 | **Signed** | Developer ID, notarized by Apple |
 
 ## Using the wheel
@@ -65,13 +65,13 @@ the original. Everything runs on your Mac: no account, no network calls, no thir
 | **Option (⌥) while dragging** | Switches to the editing tools |
 
 **Show wheel while dragging files** in the menu makes the wheel appear by itself when you start dragging a
-file in Finder. It is off until you turn it on. **Open With → OrbitDrop** in Finder works as well.
+file in Finder. It is off until you turn it on. **Open With → Switcheroo** in Finder works as well.
 
-Use **History folder → Choose folder…** to keep results somewhere other than `~/Documents/OrbitDrop`.
+Use **History folder → Choose folder…** to keep results somewhere other than `~/Documents/Switcheroo`.
 
 ## Limits worth knowing
 
-- Editing tools work on one file at a time. For a PDF you choose the page to export as an image; OrbitDrop does not rewrite or redact a whole PDF.
+- Editing tools work on one file at a time. For a PDF you choose the page to export as an image; Switcheroo does not rewrite or redact a whole PDF.
 - DOCX export keeps the text, not the original layout, columns or tables. OCR can make mistakes, so read its output.
 - Animated and multi-frame images use their first frame. Video, audio and folders are not handled.
 - Images are limited to 64 megapixels and 16,000 pixels on a side. PDF pages are rendered at about 144 dpi.
@@ -84,7 +84,7 @@ no packages are required.
 
 ```bash
 bash scripts/build.sh
-open build/OrbitDrop.app
+open build/Switcheroo.app
 ```
 
 The build compiles the app, draws its icon, signs it for local use and runs the self-test: checks of
@@ -100,11 +100,11 @@ folder and inspects the finished bundle. `Tests/Mac-acceptance.md` lists what is
 SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" NOTARY_PROFILE="your-profile" bash scripts/release.sh
 ```
 
-That makes `dist/OrbitDrop-macos.zip`, a universal build, stapled and ready to attach to a release.
+That makes `dist/Switcheroo-macos.zip`, a universal build, stapled and ready to attach to a release.
 
 ## How it is put together
 
-Swift and AppKit only, in `Sources/OrbitDrop`:
+Swift and AppKit only, in `Sources/Switcheroo`:
 
 | File | What it holds |
 |--|--|
@@ -119,8 +119,8 @@ Swift and AppKit only, in `Sources/OrbitDrop`:
 
 ## Remove it
 
-Quit OrbitDrop from its menu and move the app to the Trash. It installs no launch agents, Finder
-extensions or background services. Your results stay in `~/Documents/OrbitDrop` until you delete them.
+Quit Switcheroo from its menu and move the app to the Trash. It installs no launch agents, Finder
+extensions or background services. Your results stay in `~/Documents/Switcheroo` until you delete them.
 
 ---
 
