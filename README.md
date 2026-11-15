@@ -8,9 +8,16 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/markadebartolo/Switcheroo/releases/latest"><strong>Download for Mac</strong></a>
+  <a href="https://github.com/markadebartolo/Switcheroo/releases/latest/download/Switcheroo-macos.zip"><strong>Download for Mac</strong></a>
   &nbsp;·&nbsp;
   <a href="https://github.com/markadebartolo/Switcheroo/releases">All releases</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/macOS-13%2B-000000?style=flat-square&logo=apple&logoColor=white" alt="macOS 13 or later">
+  <img src="https://img.shields.io/badge/universal-Apple%20Silicon%20%2B%20Intel-000000?style=flat-square&logo=apple&logoColor=white" alt="Universal: Apple Silicon and Intel">
+  <img src="https://img.shields.io/badge/on--device-only-FA6B33?style=flat-square" alt="On-device only">
+  <img src="https://img.shields.io/badge/notarized-Developer%20ID-007AFF?style=flat-square&logo=apple&logoColor=white" alt="Notarized">
 </p>
 
 <p align="center">
@@ -24,7 +31,8 @@
 Converting a screenshot, cropping a photo or pulling the text out of a PDF usually means opening an app,
 finding the file, exporting, and naming the result. Switcheroo is one window: drop a file on it, it tells
 you what the file is, and you click what you want it to be. The result is kept beside a copy of the
-original, in the app's own history. Everything runs on your Mac: no account, no network calls, no third-party code.
+original, in the app's own history. Your files never leave your Mac: there is no account and nothing is uploaded. The only time Switcheroo
+uses the network is to check for a newer version of itself.
 
 ## Features
 
@@ -46,8 +54,8 @@ original, in the app's own history. Everything runs on your Mac: no account, no 
 
 ## Get started
 
-1. Download **Switcheroo-macos.zip** from [Releases](https://github.com/markadebartolo/Switcheroo/releases/latest) and unzip it.
-2. Move **Switcheroo.app** to your Applications folder and open it.
+1. Download **[Switcheroo-macos.zip](https://github.com/markadebartolo/Switcheroo/releases/latest/download/Switcheroo-macos.zip)** and unzip it.
+2. Move **Switcheroo.app** to your Applications folder and open it. It is notarized, so it opens normally.
 3. Drop a file on the window. Switcheroo shows what it is: its type, size and dimensions or page count.
 4. Click the format to switch it to, or a tool to crop, compress, annotate or redact it.
 5. The result appears at the top of **History**. Drag it out of the window, double-click it to open it, or choose **Show in Finder**.
@@ -59,6 +67,8 @@ original, in the app's own history. Everything runs on your Mac: no account, no 
 | **Works on** | Apple Silicon and Intel Macs · macOS 13 Ventura or later |
 | **File** | `Switcheroo-macos.zip`, a universal build |
 | **Signed** | Developer ID, notarized by Apple |
+| **Updates** | Built in. Switcheroo offers a new version when one is released |
+| **Not for** | Windows, or macOS 12 and earlier |
 
 ## Using the wheel
 
@@ -112,11 +122,13 @@ version, checked against its SHA-256) and places it inside the app.
 **Sign and notarize** with your own Developer ID:
 
 ```bash
-SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" NOTARY_PROFILE="your-profile" bash scripts/release.sh
+SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" NOTARY_PROFILE="your-profile" SPARKLE_ACCOUNT="your-key" bash scripts/release.sh
 ```
 
 That makes `dist/Switcheroo-macos.zip`, a universal build, stapled, and `dist/appcast.xml`, the signed
 update feed. Attach both to a release; installed copies read the feed from the latest release.
+`SPARKLE_ACCOUNT` names the keychain account holding the key updates are signed with; its public half is
+`SUPublicEDKey` in `Resources/Info.plist`. Raise both version numbers there before each release.
 
 ## How it is put together
 
