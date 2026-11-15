@@ -11,21 +11,28 @@ func makeIcon(_ pixels: Int) throws -> Data {
     defer { NSGraphicsContext.restoreGraphicsState() }
     let scale = CGFloat(pixels) / 1024
     NSGraphicsContext.current!.cgContext.scaleBy(x: scale, y: scale)
-    let rect = CGRect(x: 32, y: 32, width: 960, height: 960)
-    let rounded = NSBezierPath(roundedRect: rect, xRadius: 210, yRadius: 210)
-    let gradient = NSGradient(starting: NSColor(srgbRed: 1, green: 0.76, blue: 0.42, alpha: 1),
-                              ending: NSColor(srgbRed: 0.94, green: 0.28, blue: 0.22, alpha: 1))!
-    gradient.draw(in: rounded, angle: -60)
-    let center = CGPoint(x: 512, y: 512)
-    for index in 0..<6 {
-        let angle = CGFloat(index) * 60
+    // A dark tile with two arrows passing each other: one thing switched for another.
+    let rect = CGRect(x: 64, y: 64, width: 896, height: 896)
+    let rounded = NSBezierPath(roundedRect: rect, xRadius: 200, yRadius: 200)
+    let gradient = NSGradient(starting: NSColor(srgbRed: 0.17, green: 0.17, blue: 0.21, alpha: 1),
+                              ending: NSColor(srgbRed: 0.07, green: 0.07, blue: 0.09, alpha: 1))!
+    gradient.draw(in: rounded, angle: -90)
+    NSColor.white.withAlphaComponent(0.10).setStroke()
+    rounded.lineWidth = 6; rounded.stroke()
+    /// A thick arrow along a horizontal line, pointing right when `direction` is 1 and left when -1.
+    func arrow(y: CGFloat, direction: CGFloat, color: NSColor) {
+        let tail = 512 - direction * 250, head = 512 + direction * 250
         let path = NSBezierPath()
-        path.appendArc(withCenter: center, radius: 309, startAngle: angle + 6, endAngle: angle + 54)
-        path.lineWidth = 134; path.lineCapStyle = .round
-        NSColor.white.withAlphaComponent(0.9).setStroke(); path.stroke()
+        path.move(to: CGPoint(x: tail, y: y))
+        path.line(to: CGPoint(x: head, y: y))
+        path.move(to: CGPoint(x: head - direction * 120, y: y + 120))
+        path.line(to: CGPoint(x: head, y: y))
+        path.line(to: CGPoint(x: head - direction * 120, y: y - 120))
+        path.lineWidth = 78; path.lineCapStyle = .round; path.lineJoinStyle = .round
+        color.setStroke(); path.stroke()
     }
-    NSColor.white.setFill()
-    NSBezierPath(ovalIn: CGRect(x: 415, y: 415, width: 194, height: 194)).fill()
+    arrow(y: 640, direction: 1, color: .white)
+    arrow(y: 384, direction: -1, color: NSColor(srgbRed: 0.98, green: 0.42, blue: 0.20, alpha: 1))
     return rep.representation(using: .png, properties: [:])!
 }
 for size in [16, 32, 128, 256, 512] {

@@ -7,9 +7,11 @@ struct OutputSession {
 }
 
 enum OutputStore {
+    /// History lives with the app, in its Application Support folder, unless another folder is chosen.
     static var defaultFolder: URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Switcheroo", isDirectory: true)
+            .appendingPathComponent("History", isDirectory: true)
     }
 
     static func makeSession(sources: [URL], base: URL?) throws -> OutputSession {

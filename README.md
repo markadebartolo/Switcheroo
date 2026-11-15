@@ -4,7 +4,7 @@
 
 <p align="center">
   <strong>Switcheroo</strong><br>
-  <sub>Switch a file into what you need: drop an image or PDF on a floating wheel to convert, crop, compress or redact it</sub>
+  <sub>Switch a file into what you need: drop an image or PDF, see what it is, and choose what it becomes</sub>
 </p>
 
 <p align="center">
@@ -13,14 +13,18 @@
   <a href="https://github.com/markadebartolo/Switcheroo/releases">All releases</a>
 </p>
 
+<p align="center">
+  <img src="docs/media/switcheroo-window.png" alt="The Switcheroo window: a place to drop a file, the formats it can become, and a history of earlier switches" width="520">
+</p>
+
 ---
 
 ## Why Switcheroo
 
 Converting a screenshot, cropping a photo or pulling the text out of a PDF usually means opening an app,
-finding the file, exporting, and naming the result. Switcheroo puts those actions in a small wheel that
-appears where you are already working. Drop a file on a sector and the result is saved beside a copy of
-the original. Everything runs on your Mac: no account, no network calls, no third-party code.
+finding the file, exporting, and naming the result. Switcheroo is one window: drop a file on it, it tells
+you what the file is, and you click what you want it to be. The result is kept beside a copy of the
+original, in the app's own history. Everything runs on your Mac: no account, no network calls, no third-party code.
 
 ## Features
 
@@ -34,7 +38,8 @@ the original. Everything runs on your Mac: no account, no network calls, no thir
 - **Annotate** with text labels and outline rectangles.
 - **Redact** by replacing the selected pixels with solid black in a new flattened image.
 - **Metadata**: see what an image or PDF carries, and save a clean copy without EXIF or GPS data.
-- **Nothing is overwritten.** Every action makes a timestamped folder with a `Before` copy of each source and the results in `After`.
+- **Nothing is overwritten, nothing to tidy.** Every switch is kept in the app's history, the original beside the result. Drag a row out of the window to put the result wherever you want it.
+- **An action wheel too**, if you prefer it: the same actions in a ring at your cursor.
 - **Your color**: choose the wheel's color in Settings, from seven ready-made colors or any color you like.
 - **Menu bar only**: no Dock icon and no background services.
 
@@ -42,9 +47,9 @@ the original. Everything runs on your Mac: no account, no network calls, no thir
 
 1. Download **Switcheroo-macos.zip** from [Releases](https://github.com/markadebartolo/Switcheroo/releases/latest) and unzip it.
 2. Move **Switcheroo.app** to your Applications folder and open it.
-3. Click the Switcheroo icon in the menu bar, then **Choose files…** or **Show action wheel**.
-4. Drop a file on a sector, or press its number key.
-5. Find the result in `~/Documents/Switcheroo`, in the newest folder, under `After`.
+3. Drop a file on the window. Switcheroo shows what it is: its type, size and dimensions or page count.
+4. Click the format to switch it to, or a tool to crop, compress, annotate or redact it.
+5. The result appears at the top of **History**. Drag it out of the window, double-click it to open it, or choose **Show in Finder**.
 
 ### Who can use the download
 
@@ -55,6 +60,8 @@ the original. Everything runs on your Mac: no account, no network calls, no thir
 | **Signed** | Developer ID, notarized by Apple |
 
 ## Using the wheel
+
+Choose **Show action wheel** from the menu bar icon for the same actions in a ring at your cursor.
 
 | Key or action | What it does |
 |--|--|
@@ -70,7 +77,8 @@ file in Finder. It is off until you turn it on. **Open With → Switcheroo** in 
 
 **Settings…** (⌘,) changes the color of the wheel.
 
-Use **History folder → Choose folder…** to keep results somewhere other than `~/Documents/Switcheroo`.
+History is kept inside the app (`~/Library/Application Support/Switcheroo/History`), with a `Before` and an
+`After` folder for every switch. Use **History folder → Choose folder…** to keep it somewhere you choose.
 
 ## Limits worth knowing
 
@@ -112,6 +120,7 @@ Swift and AppKit only, in `Sources/Switcheroo`:
 | File | What it holds |
 |--|--|
 | `AppDelegate.swift` | The menu bar item, drag detection, choosing files, where results go |
+| `MainWindow.swift` | The window: the drop zone, what a file can become, and the history |
 | `Wheel.swift` | The translucent wheel, its drop targets, keyboard control and accessibility labels |
 | `WheelTheme.swift` | The wheel's color and the Settings window that changes it |
 | `Canvas.swift` | Crop selection and the annotate and redact interactions |
@@ -124,7 +133,8 @@ Swift and AppKit only, in `Sources/Switcheroo`:
 ## Remove it
 
 Quit Switcheroo from its menu and move the app to the Trash. It installs no launch agents, Finder
-extensions or background services. Your results stay in `~/Documents/Switcheroo` until you delete them.
+extensions or background services. Your history stays in `~/Library/Application Support/Switcheroo` until
+you delete it.
 
 ---
 

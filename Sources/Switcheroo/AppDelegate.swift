@@ -16,6 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var progressPanel: NSPanel?
     private var welcome: NSWindow?
     private let settings = SettingsController()
+    private let mainWindow = MainWindowController()
     private var themeObserver: NSObjectProtocol?
     private var automatic: Bool {
         get { return (UserDefaults.standard.object(forKey: "automaticDragOptIn") as? Bool) ?? false }
@@ -33,8 +34,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         createMainMenu()
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        statusItem.button?.image = NSImage(systemSymbolName: "circle.hexagongrid.fill", accessibilityDescription: "Switcheroo")
-        statusItem.button?.toolTip = "Switcheroo — file actions at your cursor"
+        statusItem.button?.image = NSImage(systemSymbolName: "arrow.left.arrow.right.circle.fill", accessibilityDescription: "Switcheroo")
+        statusItem.button?.toolTip = "Switcheroo: switch a file into what you need"
         let menu = NSMenu(); menu.delegate = self; menu.autoenablesItems = false; statusItem.menu = menu
         wheel.view.chooseFiles = { [weak self] in self?.chooseFiles() }
         wheel.view.perform = { [weak self] action, files in self?.perform(action, files: files) }
@@ -43,18 +44,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         let timer = Timer(timeInterval: 0.08, repeats: true) { [weak self] _ in self?.checkDrag() }
         RunLoop.main.add(timer, forMode: .common); self.timer = timer
-        if !UserDefaults.standard.bool(forKey: "hasLaunched") {
-            UserDefaults.standard.set(true, forKey: "hasLaunched"); showWelcome()
-        }
+        mainWindow.perform = { [weak self] action, files in self?.perform(action, files: files) }
+        mainWindow.chooseFiles = { [weak self] in self?.chooseForWindow() }
+        mainWindow.baseFolder = { [weak self] in self?.folder ?? OutputStore.defaultFolder }
+        // Opening the app shows its window, ready for a file.
+        mainWindow.show()
     }
     func applicationWillTerminate(_ notification: Notification) {
         timer?.invalidate()
         if let dragMonitor { NSEvent.removeMonitor(dragMonitor) }
     }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
-    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool { showWheel(); return true }
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool { mainWindow.show(); return true }
     func application(_ application: NSApplication, open urls: [URL]) {
-        selected = urls.filter { $0.isFileURL }; showWheel()
+        selected = urls.filter { $0.isFileURL }; mainWindow.load(selected); mainWindow.show()
     }
     private func createMainMenu() {
         let main = NSMenu()
@@ -78,13 +81,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let item = NSMenuItem(title: title, action: action, keyEquivalent: key); item.target = self
             menu.addItem(item); return item
         }
+        _ = add("Open Switcheroo", #selector(showMain), key: "n")
         _ = add("Show action wheel", #selector(showWheel), key: "d")
         _ = add("Choose files…", #selector(chooseFiles), key: "o")
         menu.addItem(.separator())
         let auto = add("Show wheel while dragging files", #selector(toggleAutomatic)); auto.state = automatic ? .on : .off
         let outputMenu = NSMenu(title: "History folder")
         let item = NSMenuItem(title: "History folder", action: nil, keyEquivalent: ""); item.submenu = outputMenu; menu.addItem(item)
-        let alongside = NSMenuItem(title: "Documents/Switcheroo", action: #selector(useDefaultFolder), keyEquivalent: "")
+        let alongside = NSMenuItem(title: "Inside Switcheroo", action: #selector(useDefaultFolder), keyEquivalent: "")
         alongside.target = self; alongside.state = folder == nil ? .on : .off; outputMenu.addItem(alongside)
         let custom = NSMenuItem(title: folder.map { "Choose folder… (\($0.lastPathComponent))" } ?? "Choose folder…", action: #selector(chooseFolder), keyEquivalent: "")
         custom.target = self; custom.state = folder == nil ? .off : .on; outputMenu.addItem(custom)
@@ -95,14 +99,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         _ = add("Quit Switcheroo", #selector(quit), key: "q")
     }
     @objc private func quit() { NSApp.terminate(nil) }
+    @objc private func showMain() { wheel.hide(); mainWindow.show() }
+    private func chooseForWindow() {
+        guard !working else { return }
+        let panel = NSOpenPanel(); panel.allowsMultipleSelection = true; panel.canChooseDirectories = false
+        panel.allowedContentTypes = [.image, .pdf]; panel.prompt = "Choose"
+        if panel.runModal() == .OK { selected = panel.urls; mainWindow.load(panel.urls) }
+    }
     @objc private func showSettings() { wheel.hide(); settings.show() }
     @objc private func toggleAutomatic() { automatic.toggle(); if !automatic { wheel.hide() } }
-    @objc private func useDefaultFolder() { folder = nil }
+    @objc private func useDefaultFolder() { folder = nil; mainWindow.reloadHistory() }
     @objc private func chooseFolder() {
         let panel = NSOpenPanel(); panel.canChooseDirectories = true; panel.canChooseFiles = false
         panel.prompt = "Save copies here"; panel.canCreateDirectories = true
         NSApp.activate(ignoringOtherApps: true)
-        if panel.runModal() == .OK { folder = panel.url }
+        if panel.runModal() == .OK { folder = panel.url; mainWindow.reloadHistory() }
     }
     @objc private func revealLast() { NSWorkspace.shared.activateFileViewerSelecting(lastOutputs) }
     @objc func showWheel() {
@@ -189,6 +200,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func finish(outputs: [URL], errors: [String]) {
         working = false; progressPanel?.close(); progressPanel = nil
         if !outputs.isEmpty { lastOutputs = outputs; selected = outputs }
+        mainWindow.finished(outputs: outputs, errors: errors)
+        // With the window open, the result is shown there, at the top of the history.
+        if mainWindow.isVisible && errors.isEmpty && !outputs.isEmpty { return }
         let alert = NSAlert()
         alert.messageText = outputs.isEmpty ? "No files saved" : "\(outputs.count) \(outputs.count == 1 ? "file" : "files") saved"
         var details = outputs.prefix(5).map { $0.lastPathComponent }.joined(separator: "\n")
@@ -239,7 +253,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         title.font = .systemFont(ofSize: 24, weight: .bold); title.frame = CGRect(x: 30, y: 294, width: 465, height: 36)
         window.contentView?.addSubview(title)
         let detail = NSTextField(wrappingLabelWithString:
-            "1. Choose a file below, or click the menu-bar icon and choose Show action wheel.\n\n2. Click a format to convert. Tab switches to Crop, Add BG, and editing tools. Optional Finder drag detection can be enabled in the menu.\n\n3. Each action saves Before and After copies in a timestamped Documents/Switcheroo folder. Change the history location from the menu-bar icon.\n\nYou can also choose files below, then click an action. Tab switches wheels; Escape closes. All processing stays on your Mac.")
+            "1. Open Switcheroo and drop a file on its window. It tells you what the file is and what it can become.\n\n2. Click a format to switch it, or a tool to crop, compress, annotate or redact it.\n\n3. Every switch is kept in the window's history, the original beside the result. Drag a row out to put the result anywhere.\n\nPrefer the wheel? Choose Show action wheel from the menu-bar icon, or turn on Show wheel while dragging files. All processing stays on your Mac.")
         detail.font = .systemFont(ofSize: 13); detail.frame = CGRect(x: 30, y: 77, width: 460, height: 202)
         window.contentView?.addSubview(detail)
         let open = NSButton(title: "Choose a file…", target: self, action: #selector(welcomeChoose))
