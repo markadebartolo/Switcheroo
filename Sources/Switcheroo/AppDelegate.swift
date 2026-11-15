@@ -1,5 +1,6 @@
 import AppKit
 import UniformTypeIdentifiers
+import Sparkle
 
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem!
@@ -17,6 +18,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var welcome: NSWindow?
     private let settings = SettingsController()
     private let mainWindow = MainWindowController()
+    /// Checks the release feed for a newer Switcheroo and installs it when the user agrees.
+    private let updater = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
     private var themeObserver: NSObjectProtocol?
     private var automatic: Bool {
         get { return (UserDefaults.standard.object(forKey: "automaticDragOptIn") as? Bool) ?? false }
@@ -95,6 +98,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let recent = add("Reveal last saved files", #selector(revealLast)); recent.isEnabled = !lastOutputs.isEmpty
         menu.addItem(.separator())
         _ = add("Settings…", #selector(showSettings), key: ",")
+        let updates = NSMenuItem(title: "Check for Updates…", action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: "")
+        updates.target = updater; menu.addItem(updates)
         _ = add("How to use Switcheroo", #selector(showWelcome))
         _ = add("Quit Switcheroo", #selector(quit), key: "q")
     }

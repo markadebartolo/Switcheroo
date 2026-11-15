@@ -41,6 +41,7 @@ original, in the app's own history. Everything runs on your Mac: no account, no 
 - **Nothing is overwritten, nothing to tidy.** Every switch is kept in the app's history, the original beside the result. Drag a row out of the window to put the result wherever you want it.
 - **An action wheel too**, if you prefer it: the same actions in a ring at your cursor.
 - **Your color**: choose the wheel's color in Settings, from seven ready-made colors or any color you like.
+- **Updates itself**: Switcheroo checks for a newer release and offers to install it. **Check for Updates…** is in the menu.
 - **Menu bar only**: no Dock icon and no background services.
 
 ## Get started
@@ -105,13 +106,17 @@ folder and inspects the finished bundle. `Tests/Mac-acceptance.md` lists what is
 
 `Install.command` builds the app and puts it in `~/Applications` in one step.
 
+The build fetches [Sparkle](https://sparkle-project.org), which handles updates, into `vendor/` (a pinned
+version, checked against its SHA-256) and places it inside the app.
+
 **Sign and notarize** with your own Developer ID:
 
 ```bash
 SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" NOTARY_PROFILE="your-profile" bash scripts/release.sh
 ```
 
-That makes `dist/Switcheroo-macos.zip`, a universal build, stapled and ready to attach to a release.
+That makes `dist/Switcheroo-macos.zip`, a universal build, stapled, and `dist/appcast.xml`, the signed
+update feed. Attach both to a release; installed copies read the feed from the latest release.
 
 ## How it is put together
 

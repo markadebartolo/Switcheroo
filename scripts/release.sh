@@ -29,5 +29,12 @@ echo "Sending to Apple's notary service..."
 # The zip that people download holds the stapled app.
 /bin/rm -f "$app_zip"
 /usr/bin/ditto -c -k --keepParent "$app_app" "$app_zip"
+# The update feed: Sparkle signs the zip with the EdDSA key in the keychain and writes appcast.xml beside it.
+app_version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app_app/Contents/Info.plist")"
+app_sparkle="$(/bin/bash "$app_root/scripts/fetch-sparkle.sh" | /usr/bin/tail -1)"
+/bin/rm -f "$app_dist/appcast.xml"
+"$app_sparkle/bin/generate_appcast" "$app_dist" \
+  --download-url-prefix "https://github.com/markadebartolo/Switcheroo/releases/download/v${app_version}/" \
+  --link "https://github.com/markadebartolo/Switcheroo"
 /usr/bin/shasum -a 256 "$app_zip"
-echo "Ready to attach to a GitHub release: $app_zip"
+echo "Ready to attach to a GitHub release: $app_zip and $app_dist/appcast.xml"
