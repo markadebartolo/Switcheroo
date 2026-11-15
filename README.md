@@ -36,13 +36,13 @@ the original. Everything runs on your Mac: no account, no network calls, no thir
 - **Metadata**: see what an image or PDF carries, and save a clean copy without EXIF or GPS data.
 - **Nothing is overwritten.** Every action makes a timestamped folder with a `Before` copy of each source and the results in `After`.
 - **Your color**: choose the wheel's color in Settings, from seven ready-made colors or any color you like.
-- **In the Dock and the menu bar**: click either to bring up the wheel. No background services.
+- **Menu bar only**: no Dock icon and no background services.
 
 ## Get started
 
 1. Download **Switcheroo-macos.zip** from [Releases](https://github.com/markadebartolo/Switcheroo/releases/latest) and unzip it.
 2. Move **Switcheroo.app** to your Applications folder and open it.
-3. Click Switcheroo in the Dock, or its icon in the menu bar, then **Choose files…** or **Show action wheel**.
+3. Click the Switcheroo icon in the menu bar, then **Choose files…** or **Show action wheel**.
 4. Drop a file on a sector, or press its number key.
 5. Find the result in `~/Documents/Switcheroo`, in the newest folder, under `After`.
 
@@ -129,5 +129,5 @@ extensions or background services. Your results stay in `~/Documents/Switcheroo`
 ---
 
 <p align="center">
-  <sub>Dock and menu bar · On-device only · Originals always kept</sub>
+  <sub>Menu bar · On-device only · Originals always kept</sub>
 </p>

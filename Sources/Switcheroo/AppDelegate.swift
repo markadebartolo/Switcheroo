@@ -27,8 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // In the Dock as well as the menu bar: clicking the Dock icon shows the wheel.
-        NSApp.setActivationPolicy(.regular)
+        NSApp.setActivationPolicy(.accessory)
         themeObserver = NotificationCenter.default.addObserver(forName: WheelTheme.changed, object: nil, queue: .main) { [weak self] _ in
             self?.wheel.view.needsDisplay = true
         }
@@ -66,11 +65,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         app.submenu?.addItem(settingsItem)
         app.submenu?.addItem(.separator())
         app.submenu?.addItem(quit)
-        let file = NSMenuItem(title: "File", action: nil, keyEquivalent: ""); main.addItem(file)
-        file.submenu = NSMenu(title: "File")
-        let choose = NSMenuItem(title: "Choose Files…", action: #selector(chooseFiles), keyEquivalent: "o"); choose.target = self
-        let show = NSMenuItem(title: "Show Action Wheel", action: #selector(showWheel), keyEquivalent: "d"); show.target = self
-        file.submenu?.addItem(choose); file.submenu?.addItem(show)
         let edit = NSMenuItem(title: "Edit", action: nil, keyEquivalent: ""); main.addItem(edit)
         edit.submenu = NSMenu(title: "Edit")
         for (title, key, action) in [("Cut", "x", "cut:"), ("Copy", "c", "copy:"), ("Paste", "v", "paste:"), ("Select All", "a", "selectAll:")] {
