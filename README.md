@@ -35,13 +35,14 @@ the original. Everything runs on your Mac: no account, no network calls, no thir
 - **Redact** by replacing the selected pixels with solid black in a new flattened image.
 - **Metadata**: see what an image or PDF carries, and save a clean copy without EXIF or GPS data.
 - **Nothing is overwritten.** Every action makes a timestamped folder with a `Before` copy of each source and the results in `After`.
-- **Menu bar only**: no Dock icon and no background services.
+- **Your color**: choose the wheel's color in Settings, from seven ready-made colors or any color you like.
+- **In the Dock and the menu bar**: click either to bring up the wheel. No background services.
 
 ## Get started
 
 1. Download **Switcheroo-macos.zip** from [Releases](https://github.com/markadebartolo/Switcheroo/releases/latest) and unzip it.
 2. Move **Switcheroo.app** to your Applications folder and open it.
-3. Click the Switcheroo icon in the menu bar, then **Choose files…** or **Show action wheel**.
+3. Click Switcheroo in the Dock, or its icon in the menu bar, then **Choose files…** or **Show action wheel**.
 4. Drop a file on a sector, or press its number key.
 5. Find the result in `~/Documents/Switcheroo`, in the newest folder, under `After`.
 
@@ -66,6 +67,8 @@ the original. Everything runs on your Mac: no account, no network calls, no thir
 
 **Show wheel while dragging files** in the menu makes the wheel appear by itself when you start dragging a
 file in Finder. It is off until you turn it on. **Open With → Switcheroo** in Finder works as well.
+
+**Settings…** (⌘,) changes the color of the wheel.
 
 Use **History folder → Choose folder…** to keep results somewhere other than `~/Documents/Switcheroo`.
 
@@ -110,6 +113,7 @@ Swift and AppKit only, in `Sources/Switcheroo`:
 |--|--|
 | `AppDelegate.swift` | The menu bar item, drag detection, choosing files, where results go |
 | `Wheel.swift` | The translucent wheel, its drop targets, keyboard control and accessibility labels |
+| `WheelTheme.swift` | The wheel's color and the Settings window that changes it |
 | `Canvas.swift` | Crop selection and the annotate and redact interactions |
 | `Editor.swift` | The editing windows and their controls |
 | `ImageEngine.swift` | Rendering, conversion, OCR, image effects and collision-safe saving |
@@ -125,5 +129,5 @@ extensions or background services. Your results stay in `~/Documents/Switcheroo`
 ---
 
 <p align="center">
-  <sub>Menu bar · On-device only · Originals always kept</sub>
+  <sub>Dock and menu bar · On-device only · Originals always kept</sub>
 </p>

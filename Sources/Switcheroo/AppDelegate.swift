@@ -15,6 +15,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var lastOutputs: [URL] = []
     private var progressPanel: NSPanel?
     private var welcome: NSWindow?
+    private let settings = SettingsController()
+    private var themeObserver: NSObjectProtocol?
     private var automatic: Bool {
         get { return (UserDefaults.standard.object(forKey: "automaticDragOptIn") as? Bool) ?? false }
         set { UserDefaults.standard.set(newValue, forKey: "automaticDragOptIn") }
@@ -25,7 +27,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.setActivationPolicy(.accessory)
+        // In the Dock as well as the menu bar: clicking the Dock icon shows the wheel.
+        NSApp.setActivationPolicy(.regular)
+        themeObserver = NotificationCenter.default.addObserver(forName: WheelTheme.changed, object: nil, queue: .main) { [weak self] _ in
+            self?.wheel.view.needsDisplay = true
+        }
         createMainMenu()
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         statusItem.button?.image = NSImage(systemSymbolName: "circle.hexagongrid.fill", accessibilityDescription: "Switcheroo")
@@ -55,7 +61,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let main = NSMenu()
         let app = NSMenuItem(); main.addItem(app); app.submenu = NSMenu(title: "Switcheroo")
         let quit = NSMenuItem(title: "Quit Switcheroo", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let settingsItem = NSMenuItem(title: "Settings…", action: #selector(showSettings), keyEquivalent: ",")
+        settingsItem.target = self
+        app.submenu?.addItem(settingsItem)
+        app.submenu?.addItem(.separator())
         app.submenu?.addItem(quit)
+        let file = NSMenuItem(title: "File", action: nil, keyEquivalent: ""); main.addItem(file)
+        file.submenu = NSMenu(title: "File")
+        let choose = NSMenuItem(title: "Choose Files…", action: #selector(chooseFiles), keyEquivalent: "o"); choose.target = self
+        let show = NSMenuItem(title: "Show Action Wheel", action: #selector(showWheel), keyEquivalent: "d"); show.target = self
+        file.submenu?.addItem(choose); file.submenu?.addItem(show)
         let edit = NSMenuItem(title: "Edit", action: nil, keyEquivalent: ""); main.addItem(edit)
         edit.submenu = NSMenu(title: "Edit")
         for (title, key, action) in [("Cut", "x", "cut:"), ("Copy", "c", "copy:"), ("Paste", "v", "paste:"), ("Select All", "a", "selectAll:")] {
@@ -81,10 +96,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         custom.target = self; custom.state = folder == nil ? .off : .on; outputMenu.addItem(custom)
         let recent = add("Reveal last saved files", #selector(revealLast)); recent.isEnabled = !lastOutputs.isEmpty
         menu.addItem(.separator())
+        _ = add("Settings…", #selector(showSettings), key: ",")
         _ = add("How to use Switcheroo", #selector(showWelcome))
         _ = add("Quit Switcheroo", #selector(quit), key: "q")
     }
     @objc private func quit() { NSApp.terminate(nil) }
+    @objc private func showSettings() { wheel.hide(); settings.show() }
     @objc private func toggleAutomatic() { automatic.toggle(); if !automatic { wheel.hide() } }
     @objc private func useDefaultFolder() { folder = nil }
     @objc private func chooseFolder() {

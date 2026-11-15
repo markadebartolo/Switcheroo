@@ -155,18 +155,16 @@ final class WheelView: NSView {
         super.draw(dirtyRect)
         for index in actions.indices {
             let p = path(index: index, count: actions.count)
-            let color = hovered == index
-                ? NSColor(srgbRed: 0.95, green: 0.30, blue: 0.16, alpha: 0.95)
-                : NSColor(srgbRed: 1, green: 0.79, blue: 0.59, alpha: 0.78)
+            let color = hovered == index ? WheelTheme.highlighted : WheelTheme.resting
             color.setFill(); color.setStroke(); p.fill(); p.stroke()
-            actionButtons[index].contentTintColor = hovered == index ? .white : NSColor(srgbRed: 0.23, green: 0.16, blue: 0.12, alpha: 1)
+            actionButtons[index].contentTintColor = hovered == index ? WheelTheme.iconOnHighlighted : WheelTheme.iconOnResting
         }
         let title = files.isEmpty ? "Drop a file" : files.count == 1 ? files[0].lastPathComponent : "\(files.count) files"
         drawText(title, rect: CGRect(x: 35, y: 326, width: 250, height: 18), size: 12, color: .labelColor)
         let centerTitle = hovered.map { actions[$0].title } ?? (editing ? "TOOLS" : "CONVERT")
         let pill = NSBezierPath(roundedRect: CGRect(x: center.x - 46, y: center.y - 15, width: 92, height: 30), xRadius: 15, yRadius: 15)
-        NSColor(srgbRed: 1, green: 0.83, blue: 0.64, alpha: 0.92).setFill(); pill.fill()
-        drawText(centerTitle, rect: CGRect(x: center.x - 46, y: center.y - 8, width: 92, height: 18), size: 10, color: .black)
+        WheelTheme.pill.setFill(); pill.fill()
+        drawText(centerTitle, rect: CGRect(x: center.x - 46, y: center.y - 8, width: 92, height: 18), size: 10, color: WheelTheme.textOnPill)
         drawText("Hold ⌥ for tools", rect: CGRect(x: center.x - 62, y: center.y - 35, width: 124, height: 15), size: 9, color: .secondaryLabelColor)
     }
 
