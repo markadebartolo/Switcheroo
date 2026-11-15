@@ -4,6 +4,9 @@
 #
 #   SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" NOTARY_PROFILE="your-profile" bash scripts/release.sh
 #
+# SPARKLE_ACCOUNT names the keychain account that holds the EdDSA key updates are signed with (Sparkle's
+# generate_keys --account NAME); the matching public key is SUPublicEDKey in Resources/Info.plist.
+#
 # NOTARY_PROFILE is the name of a notarytool keychain profile, made once with
 #   xcrun notarytool store-credentials "your-profile" --apple-id … --team-id … --password …
 # No password is read from or written to this repository. Running this script sends the app to Apple.
@@ -33,7 +36,7 @@ echo "Sending to Apple's notary service..."
 app_version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app_app/Contents/Info.plist")"
 app_sparkle="$(/bin/bash "$app_root/scripts/fetch-sparkle.sh" | /usr/bin/tail -1)"
 /bin/rm -f "$app_dist/appcast.xml"
-"$app_sparkle/bin/generate_appcast" "$app_dist" \
+"$app_sparkle/bin/generate_appcast" "$app_dist" --account "${SPARKLE_ACCOUNT:-ed25519}" \
   --download-url-prefix "https://github.com/markadebartolo/Switcheroo/releases/download/v${app_version}/" \
   --link "https://github.com/markadebartolo/Switcheroo"
 /usr/bin/shasum -a 256 "$app_zip"
